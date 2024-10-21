@@ -38,5 +38,13 @@ const applyCouponDiscount = (total: number, coupon: Coupon): number => {
 };
 
 export const updateCartItemQuantity = (cart: CartItem[], productId: string, newQuantity: number): CartItem[] => {
-  return []
+  return cart
+    .map((item) => {
+      if (item.product.id === productId) {
+        if (newQuantity === 0) return null;
+        return { ...item, quantity: Math.min(newQuantity, item.product.stock) };
+      }
+      return item;
+    })
+    .filter((item) => item !== null);
 };
