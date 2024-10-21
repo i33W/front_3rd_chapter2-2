@@ -21,11 +21,20 @@ export const getMaxApplicableDiscount = (item: CartItem): number => {
 };
 
 export const calculateCartTotal = (cart: CartItem[], selectedCoupon: Coupon | null) => {
-  return {
-    totalBeforeDiscount: 0,
-    totalAfterDiscount: 0,
-    totalDiscount: 0,
-  };
+  const totalBeforeDiscount = cart.reduce((acc, { product: { price }, quantity }) => acc + price * quantity, 0);
+  const itemDiscountTotal = cart.reduce((acc, item) => acc + calculateItemTotal(item), 0);
+
+  const totalAfterDiscount = selectedCoupon
+    ? applyCouponDiscount(itemDiscountTotal, selectedCoupon)
+    : itemDiscountTotal;
+
+  const totalDiscount = totalBeforeDiscount - totalAfterDiscount;
+
+  return { totalBeforeDiscount, totalAfterDiscount, totalDiscount };
+};
+
+const applyCouponDiscount = (total: number, coupon: Coupon): number => {
+  return coupon.discountType === "amount" ? total - coupon.discountValue : (total * (100 - coupon.discountValue)) / 100;
 };
 
 export const updateCartItemQuantity = (cart: CartItem[], productId: string, newQuantity: number): CartItem[] => {
