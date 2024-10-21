@@ -3,7 +3,7 @@ import { CartItem, Coupon } from "../../../types";
 export const calculateItemTotal = (item: CartItem): number => {
   const {
     quantity,
-    product: { price }
+    product: { price },
   } = item;
   const discountRate = 1 - getMaxApplicableDiscount(item);
   return price * quantity * discountRate;
@@ -12,7 +12,7 @@ export const calculateItemTotal = (item: CartItem): number => {
 export const getMaxApplicableDiscount = (item: CartItem): number => {
   const {
     quantity,
-    product: { discounts }
+    product: { discounts },
   } = item;
   const applicableDiscounts = discounts
     .filter(({ quantity: discountQuantity }) => quantity >= discountQuantity)
@@ -24,11 +24,28 @@ export const calculateCartTotal = (
   cart: CartItem[],
   selectedCoupon: Coupon | null
 ) => {
-  return {
-    totalBeforeDiscount: 0,
-    totalAfterDiscount: 0,
-    totalDiscount: 0,
-  };
+  const totalBeforeDiscount = cart.reduce(
+    (acc, { product: { price }, quantity }) => acc + price * quantity,
+    0
+  );
+  const itemDiscountTotal = cart.reduce(
+    (acc, item) => acc + calculateItemTotal(item),
+    0
+  );
+
+  const totalAfterDiscount = selectedCoupon
+    ? applyCouponDiscount(itemDiscountTotal, selectedCoupon)
+    : itemDiscountTotal;
+
+  const totalDiscount = totalBeforeDiscount - totalAfterDiscount;
+
+  return { totalBeforeDiscount, totalAfterDiscount, totalDiscount };
+};
+
+const applyCouponDiscount = (total: number, coupon: Coupon): number => {
+  return coupon.discountType === "amount"
+    ? total - coupon.discountValue
+    : (total * (100 - coupon.discountValue)) / 100;
 };
 
 export const updateCartItemQuantity = (
