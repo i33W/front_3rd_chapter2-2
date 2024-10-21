@@ -9,8 +9,15 @@ export const calculateItemTotal = (item: CartItem): number => {
   return price * quantity * discountRate;
 };
 
-export const getMaxApplicableDiscount = (item: CartItem) => {
-  return 0;
+export const getMaxApplicableDiscount = (item: CartItem): number => {
+  const {
+    quantity,
+    product: { discounts }
+  } = item;
+  const applicableDiscounts = discounts
+    .filter(({ quantity: discountQuantity }) => quantity >= discountQuantity)
+    .map(({ rate }) => rate);
+  return applicableDiscounts.length > 0 ? Math.max(...applicableDiscounts) : 0;
 };
 
 export const calculateCartTotal = (
