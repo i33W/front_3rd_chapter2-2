@@ -61,11 +61,10 @@ const useProductItem = ({ product, onProductUpdate }: Props) => {
   // 할인 추가 버튼 핸들러
   const handleAddDiscount = () => {
     if (product && editingProduct && showProductAccordion) {
-      const newProduct = {
-        ...product,
-        discounts: [...product.discounts, newDiscount],
-      };
-      setEditingProduct(newProduct);
+      setEditingProduct((editingProduct) => ({
+        ...editingProduct!,
+        discounts: [...editingProduct!.discounts, newDiscount],
+      }));
       setNewDiscount({ quantity: 0, rate: 0 });
     }
   };
@@ -73,11 +72,10 @@ const useProductItem = ({ product, onProductUpdate }: Props) => {
   // 할인 삭제 버튼 핸들러
   const handleRemoveDiscount = (index: number) => {
     if (product && editingProduct && showProductAccordion) {
-      const newProduct = {
-        ...product,
-        discounts: product.discounts.filter((_, i) => i !== index),
-      };
-      setEditingProduct(newProduct);
+      setEditingProduct((editingProduct) => ({
+        ...editingProduct!,
+        discounts: editingProduct!.discounts.filter((_, i) => i !== index),
+      }));
     }
   };
 
