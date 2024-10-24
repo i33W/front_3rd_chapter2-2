@@ -14,6 +14,11 @@ import { Coupon, Product } from "../../types";
 import useNewProduct from "../../refactoring/hooks/useNewProduct";
 import useProductItem from "../../refactoring/hooks/useProductItem";
 import useCouponForm from "../../refactoring/hooks/useCouponForm";
+import {
+  createEmptyProduct,
+  createProduct,
+  updateProductField,
+} from "../../refactoring/hooks/utils/newProductUtils";
 
 const mockProducts: Product[] = [
   {
@@ -661,6 +666,83 @@ describe("advanced > ", () => {
       expect(result.current.newCoupon.discountValue).toBe(
         parseInt(discountValueChangedTarget.value)
       );
+    });
+  });
+
+  describe("newProductUtils 유틸 테스트 > ", () => {
+    describe("createProduct: ", () => {
+      test("unique id를 가진 Product 생성", () => {
+        const baseProduct: Omit<Product, "id"> = {
+          name: "Test Product",
+          price: 1000,
+          stock: 10,
+          discounts: [],
+        };
+
+        const product = createProduct(baseProduct);
+
+        expect(product).toEqual({
+          ...baseProduct,
+          id: expect.any(String),
+        });
+      });
+    });
+
+    describe("createEmptyProduct: ", () => {
+      test("빈 Product 생성", () => {
+        const emptyProduct = createEmptyProduct();
+
+        expect(emptyProduct).toEqual({
+          name: "",
+          price: 0,
+          stock: 0,
+          discounts: [],
+        });
+      });
+    });
+
+    describe("updateProductField: ", () => {
+      test("Product 문자열 값 필드 변경", () => {
+        const product: Omit<Product, "id"> = {
+          name: "Test Product",
+          price: 1000,
+          stock: 10,
+          discounts: [],
+        };
+
+        const updatedProduct = updateProductField(
+          product,
+          "name",
+          "Updated Product",
+          "text"
+        );
+
+        expect(updatedProduct).toEqual({
+          ...product,
+          name: "Updated Product",
+        });
+      });
+
+      test("Product 숫자 값 필드 변경", () => {
+        const product: Omit<Product, "id"> = {
+          name: "Test Product",
+          price: 1000,
+          stock: 10,
+          discounts: [],
+        };
+
+        const updatedProduct = updateProductField(
+          product,
+          "price",
+          "2000",
+          "number"
+        );
+
+        expect(updatedProduct).toEqual({
+          ...product,
+          price: 2000,
+        });
+      });
     });
   });
 });
