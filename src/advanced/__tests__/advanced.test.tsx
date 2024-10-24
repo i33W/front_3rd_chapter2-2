@@ -12,6 +12,7 @@ import { CartPage } from "../../refactoring/components/CartPage";
 import { AdminPage } from "../../refactoring/components/AdminPage";
 import { Coupon, Product } from "../../types";
 import useNewProduct from "../../refactoring/hooks/useNewProduct";
+import useProductItem from "../../refactoring/hooks/useProductItem";
 
 const mockProducts: Product[] = [
   {
@@ -390,6 +391,181 @@ describe("advanced > ", () => {
       });
 
       expect(result.current.showNewProductForm).toBe(false);
+    });
+  });
+
+  describe("useProductItem 훅 테스트 > ", () => {
+    const product: Product = {
+      id: "1",
+      name: "테스트 상품",
+      price: 10000,
+      stock: 100,
+      discounts: [
+        { quantity: 10, rate: 0.1 },
+        { quantity: 20, rate: 0.2 },
+      ],
+    };
+
+    const mockOnProductUpdate = vi.fn();
+
+    beforeEach(() => {
+      mockOnProductUpdate.mockClear();
+    });
+
+    test("ProductItem의 초기 상태 확인", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      expect(result.current.showProductAccordion).toBe(false);
+      expect(result.current.editingProduct).toBeNull();
+      expect(result.current.newDiscount).toEqual({ quantity: 0, rate: 0 });
+    });
+
+    test("toggleProductAccordion 함수 테스트", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.toggleProductAccordion();
+      });
+
+      expect(result.current.showProductAccordion).toBe(true);
+
+      act(() => {
+        result.current.toggleProductAccordion();
+      });
+
+      expect(result.current.showProductAccordion).toBe(false);
+    });
+
+    test("handleEditProduct 함수 테스트", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.handleEditProduct(product);
+      });
+
+      expect(result.current.editingProduct).toEqual(product);
+    });
+
+    test("handleEditComplete 함수 테스트", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.handleEditProduct(product);
+      });
+
+      expect(result.current.editingProduct).not.toBe(product);
+      expect(result.current.editingProduct).toEqual(product);
+
+      act(() => {
+        result.current.handleEditComplete();
+      });
+
+      expect(mockOnProductUpdate).toHaveBeenCalledWith({ ...product });
+    });
+
+    test("handleEditingProductChange 함수 테스트", () => {
+      const nameChangedTarget = {
+        name: "name",
+        value: "수정된 상품명",
+        type: "text",
+      };
+
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.toggleProductAccordion();
+      });
+      expect(result.current.editingProduct).toBeNull();
+
+      act(() => {
+        result.current.handleEditProduct(product);
+      });
+      expect(result.current.editingProduct).toEqual(product);
+
+      act(() => {
+        result.current.handleEditingProductChange({
+          target: nameChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current.editingProduct!.name).toBe(nameChangedTarget.value);
+    });
+
+    test("handleDiscountChange 함수 테스트", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.handleDiscountChange({
+          target: { name: "quantity", value: "10", type: "number" },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.newDiscount.quantity).toBe(10);
+    });
+
+    test("handleAddDiscount 함수 테스트", () => {
+      const { result } = renderHook(() =>
+        useProductItem({ product, onProductUpdate: mockOnProductUpdate })
+      );
+
+      act(() => {
+        result.current.handleEditProduct(product);
+        result.current.toggleProductAccordion();
+        result.current.handleDiscountChange({
+          target: { name: "quantity", value: "10", type: "number" },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+      act(() => {
+        result.current.handleDiscountChange({
+          target: { name: "rate", value: "20", type: "number" },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+      act(() => {
+        result.current.handleAddDiscount();
+      });
+
+      expect(result.current.editingProduct).toEqual({
+        ...product,
+        discounts: [...product.discounts, { quantity: 10, rate: 0.2 }],
+      });
+      expect(result.current.newDiscount).toEqual({ quantity: 0, rate: 0 });
+    });
+
+    test("handleRemoveDiscount 함수 테스트", () => {
+      const productWithDiscount: Product = {
+        ...product,
+        discounts: [{ quantity: 10, rate: 0.2 }],
+      };
+
+      const { result } = renderHook(() =>
+        useProductItem({
+          product: productWithDiscount,
+          onProductUpdate: mockOnProductUpdate,
+        })
+      );
+
+      act(() => {
+        result.current.handleEditProduct(productWithDiscount);
+      });
+      act(() => {
+        result.current.toggleProductAccordion();
+      });
+      act(() => {
+        result.current.handleRemoveDiscount(0);
+      });
+
+      expect(result.current.editingProduct!.discounts).toEqual([]);
     });
   });
 });
