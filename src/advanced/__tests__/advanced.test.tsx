@@ -276,7 +276,7 @@ describe("advanced > ", () => {
       mockOnProductAdd.mockClear();
     });
 
-    test("기본 값으로 초기화 되어야 한다", () => {
+    test("NewProduct의 초기 상태 확인", () => {
       const initialProduct = {
         name: "",
         price: 0,
@@ -292,7 +292,7 @@ describe("advanced > ", () => {
       expect(result.current.newProduct).toEqual(initialProduct);
     });
 
-    test("새 상품 폼의 가시성을 토글해야 한다", () => {
+    test("toggleNewProductForm 함수 테스트", () => {
       const { result } = renderHook(() =>
         useNewProduct({ onProductAdd: mockOnProductAdd })
       );
@@ -310,7 +310,7 @@ describe("advanced > ", () => {
       expect(result.current.showNewProductForm).toBe(false);
     });
 
-    test("상품 변경을 처리해야 한다", () => {
+    test("handleProductChange 함수 테스트", () => {
       const nameChangedTarget = {
         name: "name",
         value: "변경된 이름",
@@ -353,7 +353,7 @@ describe("advanced > ", () => {
       expect(result.current.newProduct.stock).toBe(stockChangedTarget.value);
     });
 
-    test("새 상품을 추가하고 폼을 리셋해야 한다", () => {
+    test("handleAddNewProduct 함수 테스트", () => {
       const { result } = renderHook(() =>
         useNewProduct({ onProductAdd: mockOnProductAdd })
       );
