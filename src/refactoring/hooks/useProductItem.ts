@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Discount, Product } from "../../types";
+import {
+  createEmptyDiscount,
+  removeDiscountAtIndex,
+  updateDiscountField,
+  updateDiscountList,
+  updateProductField,
+} from "./utils/productItemUtils";
 
 interface Props {
   product: Product;
@@ -8,76 +15,67 @@ interface Props {
 
 const useProductItem = ({ product, onProductUpdate }: Props) => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [newDiscount, setNewDiscount] = useState<Discount>({
-    quantity: 0,
-    rate: 0,
-  });
+  const [newDiscount, setNewDiscount] = useState<Discount>(
+    createEmptyDiscount()
+  );
   const [showProductAccordion, setShowProductAccordion] = useState(false);
 
-  const toggleProductAccordion = () => {
+  const toggleProductAccordion = useCallback(() => {
     setShowProductAccordion((prev) => !prev);
-  };
+  }, []);
 
   // 수정 버튼 핸들러
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = useCallback(() => {
     setEditingProduct({ ...product });
-  };
+  }, [product]);
 
   // 수정 완료 버튼 핸들러
-  const handleEditComplete = () => {
+  const handleEditComplete = useCallback(() => {
     if (editingProduct) {
       onProductUpdate(editingProduct);
       setEditingProduct(null);
     }
-  };
+  }, [editingProduct, onProductUpdate]);
 
   // 수정 입력값 변경 핸들러
   const handleEditingProductChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { type, name, value } = e.target;
     if (editingProduct) {
-      setEditingProduct((prevEditingProduct) => ({
-        ...prevEditingProduct!,
-        [name]: type === "number" ? parseInt(value) : value,
-      }));
+      setEditingProduct((prevEditingProduct) =>
+        updateProductField(prevEditingProduct!, e.target)
+      );
     }
   };
 
   // 할인 정보 변경 핸들러
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value =
-      name === "quantity"
-        ? parseInt(e.target.value)
-        : parseInt(e.target.value) / 100;
-
-    setNewDiscount((prevDiscount) => ({
-      ...prevDiscount,
-      [name]: value,
-    }));
+    setNewDiscount((prevDiscount) =>
+      updateDiscountField(prevDiscount, e.target)
+    );
   };
 
   // 할인 추가 버튼 핸들러
-  const handleAddDiscount = () => {
-    if (product && editingProduct && showProductAccordion) {
-      setEditingProduct((editingProduct) => ({
-        ...editingProduct!,
-        discounts: [...editingProduct!.discounts, newDiscount],
-      }));
-      setNewDiscount({ quantity: 0, rate: 0 });
+  const handleAddDiscount = useCallback(() => {
+    if (editingProduct) {
+      setEditingProduct((editingProduct) =>
+        updateDiscountList(editingProduct!, newDiscount)
+      );
+      setNewDiscount(createEmptyDiscount());
     }
-  };
+  }, [editingProduct, newDiscount]);
 
   // 할인 삭제 버튼 핸들러
-  const handleRemoveDiscount = (index: number) => {
-    if (product && editingProduct && showProductAccordion) {
-      setEditingProduct((editingProduct) => ({
-        ...editingProduct!,
-        discounts: editingProduct!.discounts.filter((_, i) => i !== index),
-      }));
-    }
-  };
+  const handleRemoveDiscount = useCallback(
+    (index: number) => {
+      if (editingProduct) {
+        setEditingProduct((editingProduct) =>
+          removeDiscountAtIndex(editingProduct!, index)
+        );
+      }
+    },
+    [editingProduct]
+  );
 
   return {
     showProductAccordion,
