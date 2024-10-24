@@ -294,7 +294,7 @@ describe("advanced > ", () => {
       expect(result.current.newProduct).toEqual(initialProduct);
     });
 
-    test("toggleNewProductForm 함수 테스트", () => {
+    test("새 상품 추가/취소 버튼 토글 확인", () => {
       const { result } = renderHook(() =>
         useNewProduct({ onProductAdd: mockOnProductAdd })
       );
@@ -312,7 +312,7 @@ describe("advanced > ", () => {
       expect(result.current.showNewProductForm).toBe(false);
     });
 
-    test("handleProductChange 함수 테스트", () => {
+    test("새 상품 추가 input 값 변경 확인", () => {
       const nameChangedTarget = {
         name: "name",
         value: "변경된 이름",
@@ -355,7 +355,7 @@ describe("advanced > ", () => {
       expect(result.current.newProduct.stock).toBe(stockChangedTarget.value);
     });
 
-    test("handleAddNewProduct 함수 테스트", () => {
+    test("새 상품 추가 확인", () => {
       const { result } = renderHook(() =>
         useNewProduct({ onProductAdd: mockOnProductAdd })
       );
@@ -423,7 +423,7 @@ describe("advanced > ", () => {
       expect(result.current.newDiscount).toEqual({ quantity: 0, rate: 0 });
     });
 
-    test("toggleProductAccordion 함수 테스트", () => {
+    test("상품 리스트 아이템 펼치기 토글 확인", () => {
       const { result } = renderHook(() =>
         useProductItem({ product, onProductUpdate: mockOnProductUpdate })
       );
@@ -441,7 +441,7 @@ describe("advanced > ", () => {
       expect(result.current.showProductAccordion).toBe(false);
     });
 
-    test("handleEditProduct 함수 테스트", () => {
+    test("상품 아이템 수정: 버튼 클릭 확인", () => {
       const { result } = renderHook(() =>
         useProductItem({ product, onProductUpdate: mockOnProductUpdate })
       );
@@ -453,7 +453,7 @@ describe("advanced > ", () => {
       expect(result.current.editingProduct).toEqual(product);
     });
 
-    test("handleEditComplete 함수 테스트", () => {
+    test("상품 아이템 수정: 완료 버튼 클릭 확인", () => {
       const { result } = renderHook(() =>
         useProductItem({ product, onProductUpdate: mockOnProductUpdate })
       );
@@ -472,7 +472,7 @@ describe("advanced > ", () => {
       expect(mockOnProductUpdate).toHaveBeenCalledWith({ ...product });
     });
 
-    test("handleEditingProductChange 함수 테스트", () => {
+    test("상품 아이템 수정: input 변경 확인", () => {
       const nameChangedTarget = {
         name: "name",
         value: "수정된 상품명",
@@ -501,7 +501,7 @@ describe("advanced > ", () => {
       expect(result.current.editingProduct!.name).toBe(nameChangedTarget.value);
     });
 
-    test("handleDiscountChange 함수 테스트", () => {
+    test("상품 아이템 수정: 할인 input 변경 확인", () => {
       const { result } = renderHook(() =>
         useProductItem({ product, onProductUpdate: mockOnProductUpdate })
       );
@@ -515,7 +515,7 @@ describe("advanced > ", () => {
       expect(result.current.newDiscount.quantity).toBe(10);
     });
 
-    test("handleAddDiscount 함수 테스트", () => {
+    test("상품 아이템 수정: 할인 추가 버튼 확인", () => {
       const { result } = renderHook(() =>
         useProductItem({ product, onProductUpdate: mockOnProductUpdate })
       );
@@ -543,7 +543,7 @@ describe("advanced > ", () => {
       expect(result.current.newDiscount).toEqual({ quantity: 0, rate: 0 });
     });
 
-    test("handleRemoveDiscount 함수 테스트", () => {
+    test("상품 아이템 수정: 할인 삭제 버튼 확인", () => {
       const productWithDiscount: Product = {
         ...product,
         discounts: [{ quantity: 10, rate: 0.2 }],
