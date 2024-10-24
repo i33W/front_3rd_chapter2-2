@@ -65,7 +65,6 @@ const useProductItem = ({ product, onProductUpdate }: Props) => {
         ...product,
         discounts: [...product.discounts, newDiscount],
       };
-      onProductUpdate(newProduct);
       setEditingProduct(newProduct);
       setNewDiscount({ quantity: 0, rate: 0 });
     }
@@ -78,7 +77,6 @@ const useProductItem = ({ product, onProductUpdate }: Props) => {
         ...product,
         discounts: product.discounts.filter((_, i) => i !== index),
       };
-      onProductUpdate(newProduct);
       setEditingProduct(newProduct);
     }
   };
