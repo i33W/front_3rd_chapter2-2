@@ -26,6 +26,10 @@ import {
   updateDiscountList,
   updateProductField,
 } from "../../refactoring/hooks/utils/productItemUtils";
+import {
+  createInitialCoupon,
+  updateCouponField,
+} from "../../refactoring/hooks/utils/couponFormUtils";
 
 const mockProducts: Product[] = [
   {
@@ -844,6 +848,65 @@ describe("advanced > ", () => {
           quantity: 10,
           rate: 0.1,
         });
+      });
+    });
+  });
+
+  describe("couponFormUtils 유틸 테스트 > ", () => {
+    describe("createInitialCoupon: ", () => {
+      test("빈 Coupon 객체 생성", () => {
+        const initialCoupon = createInitialCoupon();
+        expect(initialCoupon).toEqual({
+          name: "",
+          code: "",
+          discountType: "percentage",
+          discountValue: 0,
+        });
+      });
+    });
+
+    describe("updateCouponField: ", () => {
+      const coupon: Coupon = {
+        name: "Test Coupon",
+        code: "TEST10",
+        discountType: "percentage",
+        discountValue: 10,
+      };
+
+      test("string 필드 수정", () => {
+        const updatedCoupon = updateCouponField(coupon, {
+          name: "name",
+          value: "Updated Coupon",
+          type: "text",
+        });
+        expect(updatedCoupon.name).toBe("Updated Coupon");
+      });
+
+      test("number 필드 수정", () => {
+        const updatedCoupon = updateCouponField(coupon, {
+          name: "discountValue",
+          value: "20",
+          type: "number",
+        });
+        expect(updatedCoupon.discountValue).toBe(20);
+      });
+
+      test("code 필드 수정", () => {
+        const updatedCoupon = updateCouponField(coupon, {
+          name: "code",
+          value: "UPDATED10",
+          type: "text",
+        });
+        expect(updatedCoupon.code).toBe("UPDATED10");
+      });
+
+      test("discountType 필드 수정", () => {
+        const updatedCoupon = updateCouponField(coupon, {
+          name: "discountType",
+          value: "amount",
+          type: "text",
+        });
+        expect(updatedCoupon.discountType).toBe("amount");
       });
     });
   });
