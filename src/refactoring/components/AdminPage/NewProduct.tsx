@@ -26,10 +26,32 @@ const NewProduct = ({ onProductAdd }: Props) => {
     setShowNewProductForm(false);
   };
 
+  const toggleNewProductForm = () => {
+    setShowNewProductForm(!showNewProductForm);
+  };
+
+  const handleProductNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewProduct({ ...newProduct, name: e.target.value });
+  };
+
+  const handleProductPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewProduct({
+      ...newProduct,
+      price: parseInt(e.target.value),
+    });
+  };
+
+  const handleProductStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewProduct({
+      ...newProduct,
+      stock: parseInt(e.target.value),
+    });
+  };
+
   return (
     <>
       <button
-        onClick={() => setShowNewProductForm(!showNewProductForm)}
+        onClick={toggleNewProductForm}
         className="bg-green-500 text-white px-4 py-2 rounded mb-4 hover:bg-green-600"
       >
         {showNewProductForm ? "취소" : "새 상품 추가"}
@@ -48,9 +70,7 @@ const NewProduct = ({ onProductAdd }: Props) => {
               id="productName"
               type="text"
               value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, name: e.target.value })
-              }
+              onChange={handleProductNameChange}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -65,12 +85,7 @@ const NewProduct = ({ onProductAdd }: Props) => {
               id="productPrice"
               type="number"
               value={newProduct.price}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  price: parseInt(e.target.value),
-                })
-              }
+              onChange={handleProductPriceChange}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -85,12 +100,7 @@ const NewProduct = ({ onProductAdd }: Props) => {
               id="productStock"
               type="number"
               value={newProduct.stock}
-              onChange={(e) =>
-                setNewProduct({
-                  ...newProduct,
-                  stock: parseInt(e.target.value),
-                })
-              }
+              onChange={handleProductStockChange}
               className="w-full p-2 border rounded"
             />
           </div>
