@@ -30,22 +30,13 @@ const NewProduct = ({ onProductAdd }: Props) => {
     setShowNewProductForm(!showNewProductForm);
   };
 
-  const handleProductNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewProduct({ ...newProduct, name: e.target.value });
-  };
+  const handleProductChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { type, name, value } = e.target;
 
-  const handleProductPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewProduct({
-      ...newProduct,
-      price: parseInt(e.target.value),
-    });
-  };
-
-  const handleProductStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewProduct({
-      ...newProduct,
-      stock: parseInt(e.target.value),
-    });
+    setNewProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: type === "number" ? parseInt(value) : value,
+    }));
   };
 
   return (
@@ -68,9 +59,10 @@ const NewProduct = ({ onProductAdd }: Props) => {
             </label>
             <input
               id="productName"
+              name="name"
               type="text"
               value={newProduct.name}
-              onChange={handleProductNameChange}
+              onChange={handleProductChange}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -83,9 +75,10 @@ const NewProduct = ({ onProductAdd }: Props) => {
             </label>
             <input
               id="productPrice"
+              name="price"
               type="number"
               value={newProduct.price}
-              onChange={handleProductPriceChange}
+              onChange={handleProductChange}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -98,9 +91,10 @@ const NewProduct = ({ onProductAdd }: Props) => {
             </label>
             <input
               id="productStock"
+              name="stock"
               type="number"
               value={newProduct.stock}
-              onChange={handleProductStockChange}
+              onChange={handleProductChange}
               className="w-full p-2 border rounded"
             />
           </div>
