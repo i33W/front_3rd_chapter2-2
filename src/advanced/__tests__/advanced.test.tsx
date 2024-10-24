@@ -10,7 +10,7 @@ import {
 } from "@testing-library/react";
 import { CartPage } from "../../refactoring/components/CartPage";
 import { AdminPage } from "../../refactoring/components/AdminPage";
-import { Coupon, Product } from "../../types";
+import { Coupon, Discount, Product } from "../../types";
 import useNewProduct from "../../refactoring/hooks/useNewProduct";
 import useProductItem from "../../refactoring/hooks/useProductItem";
 import useCouponForm from "../../refactoring/hooks/useCouponForm";
@@ -19,6 +19,13 @@ import {
   createProduct,
   updateNewProductField,
 } from "../../refactoring/hooks/utils/newProductUtils";
+import {
+  createEmptyDiscount,
+  removeDiscountAtIndex,
+  updateDiscountField,
+  updateDiscountList,
+  updateProductField,
+} from "../../refactoring/hooks/utils/productItemUtils";
 
 const mockProducts: Product[] = [
   {
@@ -452,7 +459,7 @@ describe("advanced > ", () => {
       );
 
       act(() => {
-        result.current.handleEditProduct(product);
+        result.current.handleEditProduct();
       });
 
       expect(result.current.editingProduct).toEqual(product);
@@ -464,7 +471,7 @@ describe("advanced > ", () => {
       );
 
       act(() => {
-        result.current.handleEditProduct(product);
+        result.current.handleEditProduct();
       });
 
       expect(result.current.editingProduct).not.toBe(product);
@@ -494,7 +501,7 @@ describe("advanced > ", () => {
       expect(result.current.editingProduct).toBeNull();
 
       act(() => {
-        result.current.handleEditProduct(product);
+        result.current.handleEditProduct();
       });
       expect(result.current.editingProduct).toEqual(product);
 
@@ -526,7 +533,7 @@ describe("advanced > ", () => {
       );
 
       act(() => {
-        result.current.handleEditProduct(product);
+        result.current.handleEditProduct();
         result.current.toggleProductAccordion();
         result.current.handleDiscountChange({
           target: { name: "quantity", value: "10", type: "number" },
@@ -562,7 +569,7 @@ describe("advanced > ", () => {
       );
 
       act(() => {
-        result.current.handleEditProduct(productWithDiscount);
+        result.current.handleEditProduct();
       });
       act(() => {
         result.current.toggleProductAccordion();
@@ -741,6 +748,101 @@ describe("advanced > ", () => {
         expect(updatedProduct).toEqual({
           ...product,
           price: 2000,
+        });
+      });
+    });
+  });
+
+  describe("productItemUtils 유틸 테스트 > ", () => {
+    describe("createEmptyDiscount: ", () => {
+      test("빈 Discount 객체 생성", () => {
+        const discount = createEmptyDiscount();
+        expect(discount).toEqual({ quantity: 0, rate: 0 });
+      });
+    });
+
+    describe("updateProductField: ", () => {
+      const product: Product = {
+        id: "1",
+        name: "Test Product",
+        price: 1000,
+        stock: 10,
+        discounts: [],
+      };
+
+      test("string 필드 수정", () => {
+        const updatedProduct = updateProductField(product, {
+          name: "name",
+          value: "Updated Product",
+          type: "text",
+        });
+        expect(updatedProduct.name).toBe("Updated Product");
+      });
+
+      test("number 필드 수정", () => {
+        const updatedProduct = updateProductField(product, {
+          name: "price",
+          value: "2000",
+          type: "number",
+        });
+        expect(updatedProduct.price).toBe(2000);
+      });
+    });
+
+    describe("updateDiscountField: ", () => {
+      const discount: Discount = { quantity: 10, rate: 0.1 };
+
+      test("quantity 필드 변경", () => {
+        const updatedDiscount = updateDiscountField(discount, {
+          name: "quantity",
+          value: "20",
+        });
+        expect(updatedDiscount.quantity).toBe(20);
+      });
+
+      test("rate 필드 변경", () => {
+        const updatedDiscount = updateDiscountField(discount, {
+          name: "rate",
+          value: "20",
+        });
+        expect(updatedDiscount.rate).toBe(0.2);
+      });
+    });
+
+    describe("updateDiscountList: ", () => {
+      const product: Product = {
+        id: "1",
+        name: "Test Product",
+        price: 1000,
+        stock: 10,
+        discounts: [],
+      };
+      const newDiscount: Discount = { quantity: 5, rate: 0.05 };
+
+      test("새 discount 객체 추가", () => {
+        const updatedProduct = updateDiscountList(product, newDiscount);
+        expect(updatedProduct.discounts).toContainEqual(newDiscount);
+      });
+    });
+
+    describe("removeDiscountAtIndex: ", () => {
+      const product: Product = {
+        id: "1",
+        name: "Test Product",
+        price: 1000,
+        stock: 10,
+        discounts: [
+          { quantity: 5, rate: 0.05 },
+          { quantity: 10, rate: 0.1 },
+        ],
+      };
+
+      test("discount list에서 index로 삭제 확인", () => {
+        const updatedProduct = removeDiscountAtIndex(product, 0);
+        expect(updatedProduct.discounts).toHaveLength(1);
+        expect(updatedProduct.discounts[0]).toEqual({
+          quantity: 10,
+          rate: 0.1,
         });
       });
     });
