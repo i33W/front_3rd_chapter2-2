@@ -3,7 +3,7 @@ import { Product } from "../../types";
 import {
   createEmptyProduct,
   createProduct,
-  updateProductField,
+  updateNewProductField,
 } from "./utils/newProductUtils";
 
 interface Props {
@@ -36,7 +36,7 @@ const useNewProduct = ({ onProductAdd }: Props): UseNewProductReturn => {
 
   const handleProductChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { type, name, value } = e.target;
-    setNewProduct((prev) => updateProductField(prev, name, value, type));
+    setNewProduct((prev) => updateNewProductField(prev, name, value, type));
   };
 
   return {

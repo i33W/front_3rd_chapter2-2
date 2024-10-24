@@ -17,7 +17,7 @@ import useCouponForm from "../../refactoring/hooks/useCouponForm";
 import {
   createEmptyProduct,
   createProduct,
-  updateProductField,
+  updateNewProductField,
 } from "../../refactoring/hooks/utils/newProductUtils";
 
 const mockProducts: Product[] = [
@@ -710,7 +710,7 @@ describe("advanced > ", () => {
           discounts: [],
         };
 
-        const updatedProduct = updateProductField(
+        const updatedProduct = updateNewProductField(
           product,
           "name",
           "Updated Product",
@@ -731,7 +731,7 @@ describe("advanced > ", () => {
           discounts: [],
         };
 
-        const updatedProduct = updateProductField(
+        const updatedProduct = updateNewProductField(
           product,
           "price",
           "2000",

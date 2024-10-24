@@ -12,7 +12,7 @@ export const createEmptyProduct = (): Omit<Product, "id"> => ({
   discounts: [],
 });
 
-export const updateProductField = (
+export const updateNewProductField = (
   product: Omit<Product, "id">,
   name: string,
   value: string,
