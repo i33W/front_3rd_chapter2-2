@@ -1,43 +1,18 @@
-import { useState } from "react";
 import { Product } from "../../../types";
+import useNewProduct from "../../hooks/useNewProduct";
 
 interface Props {
   onProductAdd: (newProduct: Product) => void;
 }
 
 const NewProduct = ({ onProductAdd }: Props) => {
-  const [showNewProductForm, setShowNewProductForm] = useState(false);
-  const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
-    name: "",
-    price: 0,
-    stock: 0,
-    discounts: [],
-  });
-
-  const handleAddNewProduct = () => {
-    const productWithId = { ...newProduct, id: Date.now().toString() };
-    onProductAdd(productWithId);
-    setNewProduct({
-      name: "",
-      price: 0,
-      stock: 0,
-      discounts: [],
-    });
-    setShowNewProductForm(false);
-  };
-
-  const toggleNewProductForm = () => {
-    setShowNewProductForm(!showNewProductForm);
-  };
-
-  const handleProductChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { type, name, value } = e.target;
-
-    setNewProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
-  };
+  const {
+    showNewProductForm,
+    newProduct,
+    handleAddNewProduct,
+    toggleNewProductForm,
+    handleProductChange,
+  } = useNewProduct({ onProductAdd });
 
   return (
     <>
