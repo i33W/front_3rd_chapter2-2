@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Product } from "../../types";
+import {
+  createEmptyProduct,
+  createProduct,
+  updateProductField,
+} from "./utils/newProductUtils";
 
 interface Props {
   onProductAdd: (newProduct: Product) => void;
@@ -15,36 +20,23 @@ interface UseNewProductReturn {
 
 const useNewProduct = ({ onProductAdd }: Props): UseNewProductReturn => {
   const [showNewProductForm, setShowNewProductForm] = useState(false);
-  const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
-    name: "",
-    price: 0,
-    stock: 0,
-    discounts: [],
-  });
+  const [newProduct, setNewProduct] =
+    useState<Omit<Product, "id">>(createEmptyProduct());
 
-  const handleAddNewProduct = () => {
-    const productWithId = { ...newProduct, id: Date.now().toString() };
+  const handleAddNewProduct = useCallback(() => {
+    const productWithId = createProduct(newProduct);
     onProductAdd(productWithId);
-    setNewProduct({
-      name: "",
-      price: 0,
-      stock: 0,
-      discounts: [],
-    });
+    setNewProduct(createEmptyProduct());
     setShowNewProductForm(false);
-  };
+  }, [newProduct, onProductAdd]);
 
-  const toggleNewProductForm = () => {
-    setShowNewProductForm(!showNewProductForm);
-  };
+  const toggleNewProductForm = useCallback(() => {
+    setShowNewProductForm((prev) => !prev);
+  }, []);
 
   const handleProductChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { type, name, value } = e.target;
-
-    setNewProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
+    setNewProduct((prev) => updateProductField(prev, name, value, type));
   };
 
   return {
