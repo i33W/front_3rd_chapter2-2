@@ -1,68 +1,49 @@
-import { useState } from "react";
 import { Coupon } from "../../../types";
+import useCouponForm from "../../hooks/useCouponForm";
 
 interface Props {
   onCouponAdd: (newCoupon: Coupon) => void;
 }
 
 const CouponForm = ({ onCouponAdd }: Props) => {
-  const [newCoupon, setNewCoupon] = useState<Coupon>({
-    name: "",
-    code: "",
-    discountType: "percentage",
-    discountValue: 0,
+  const { newCoupon, handleAddCoupon, handleNewCouponChange } = useCouponForm({
+    onCouponAdd,
   });
-
-  const handleAddCoupon = () => {
-    onCouponAdd(newCoupon);
-    setNewCoupon({
-      name: "",
-      code: "",
-      discountType: "percentage",
-      discountValue: 0,
-    });
-  };
 
   return (
     <div className="space-y-2 mb-4">
       <input
+        name="name"
         type="text"
         placeholder="쿠폰 이름"
         value={newCoupon.name}
-        onChange={(e) => setNewCoupon({ ...newCoupon, name: e.target.value })}
+        onChange={handleNewCouponChange}
         className="w-full p-2 border rounded"
       />
       <input
+        name="code"
         type="text"
         placeholder="쿠폰 코드"
         value={newCoupon.code}
-        onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
+        onChange={handleNewCouponChange}
         className="w-full p-2 border rounded"
       />
       <div className="flex gap-2">
         <select
+          name="discountType"
           value={newCoupon.discountType}
-          onChange={(e) =>
-            setNewCoupon({
-              ...newCoupon,
-              discountType: e.target.value as "amount" | "percentage",
-            })
-          }
+          onChange={handleNewCouponChange}
           className="w-full p-2 border rounded"
         >
           <option value="amount">금액(원)</option>
           <option value="percentage">할인율(%)</option>
         </select>
         <input
+          name="discountValue"
           type="number"
           placeholder="할인 값"
           value={newCoupon.discountValue}
-          onChange={(e) =>
-            setNewCoupon({
-              ...newCoupon,
-              discountValue: parseInt(e.target.value),
-            })
-          }
+          onChange={handleNewCouponChange}
           className="w-full p-2 border rounded"
         />
       </div>
