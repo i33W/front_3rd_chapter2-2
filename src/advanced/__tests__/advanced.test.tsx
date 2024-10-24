@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { describe, expect, test } from "vitest";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  within,
+} from "@testing-library/react";
 import { CartPage } from "../../refactoring/components/CartPage";
 import { AdminPage } from "../../refactoring/components/AdminPage";
 import { Coupon, Product } from "../../types";
+import useNewProduct from "../../refactoring/hooks/useNewProduct";
 
 const mockProducts: Product[] = [
   {
@@ -261,13 +269,127 @@ describe("advanced > ", () => {
     });
   });
 
-  describe("자유롭게 작성해보세요.", () => {
-    test("새로운 유틸 함수를 만든 후에 테스트 코드를 작성해서 실행해보세요", () => {
-      expect(true).toBe(false);
+  describe("useNewProduct 훅 테스트 > ", () => {
+    const mockOnProductAdd = vi.fn();
+
+    beforeEach(() => {
+      mockOnProductAdd.mockClear();
     });
 
-    test("새로운 hook 함수르 만든 후에 테스트 코드를 작성해서 실행해보세요", () => {
-      expect(true).toBe(false);
+    test("기본 값으로 초기화 되어야 한다", () => {
+      const initialProduct = {
+        name: "",
+        price: 0,
+        stock: 0,
+        discounts: [],
+      };
+
+      const { result } = renderHook(() =>
+        useNewProduct({ onProductAdd: mockOnProductAdd })
+      );
+
+      expect(result.current.showNewProductForm).toBe(false);
+      expect(result.current.newProduct).toEqual(initialProduct);
+    });
+
+    test("새 상품 폼의 가시성을 토글해야 한다", () => {
+      const { result } = renderHook(() =>
+        useNewProduct({ onProductAdd: mockOnProductAdd })
+      );
+
+      act(() => {
+        result.current.toggleNewProductForm();
+      });
+
+      expect(result.current.showNewProductForm).toBe(true);
+
+      act(() => {
+        result.current.toggleNewProductForm();
+      });
+
+      expect(result.current.showNewProductForm).toBe(false);
+    });
+
+    test("상품 변경을 처리해야 한다", () => {
+      const nameChangedTarget = {
+        name: "name",
+        value: "변경된 이름",
+        type: "text",
+      };
+      const priceChangedTarget = {
+        name: "price",
+        value: 10000,
+        type: "number",
+      };
+      const stockChangedTarget = {
+        name: "stock",
+        value: 100,
+        type: "number",
+      };
+
+      const { result } = renderHook(() =>
+        useNewProduct({ onProductAdd: mockOnProductAdd })
+      );
+
+      act(() => {
+        result.current.handleProductChange({
+          target: nameChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current.newProduct.name).toBe(nameChangedTarget.value);
+
+      act(() => {
+        result.current.handleProductChange({
+          target: priceChangedTarget,
+        } as unknown as React.ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current.newProduct.price).toBe(priceChangedTarget.value);
+
+      act(() => {
+        result.current.handleProductChange({
+          target: stockChangedTarget,
+        } as unknown as React.ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current.newProduct.stock).toBe(stockChangedTarget.value);
+    });
+
+    test("새 상품을 추가하고 폼을 리셋해야 한다", () => {
+      const { result } = renderHook(() =>
+        useNewProduct({ onProductAdd: mockOnProductAdd })
+      );
+
+      act(() => {
+        result.current.handleProductChange({
+          target: { name: "name", value: "테스트 상품", type: "text" },
+        } as React.ChangeEvent<HTMLInputElement>);
+        result.current.handleProductChange({
+          target: { name: "price", value: "1000", type: "number" },
+        } as React.ChangeEvent<HTMLInputElement>);
+        result.current.handleProductChange({
+          target: { name: "stock", value: "10", type: "number" },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      act(() => {
+        result.current.handleAddNewProduct();
+      });
+
+      expect(mockOnProductAdd).toHaveBeenCalledWith({
+        name: "테스트 상품",
+        price: 1000,
+        stock: 10,
+        discounts: [],
+        id: expect.any(String),
+      });
+
+      expect(result.current.newProduct).toEqual({
+        name: "",
+        price: 0,
+        stock: 0,
+        discounts: [],
+      });
+
+      expect(result.current.showNewProductForm).toBe(false);
     });
   });
 });
