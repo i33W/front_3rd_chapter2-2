@@ -1,22 +1,20 @@
 import { useState } from "react";
 import { Coupon } from "../../types";
+import {
+  createInitialCoupon,
+  updateCouponField,
+} from "./utils/couponFormUtils";
 
 interface Props {
   onCouponAdd: (newCoupon: Coupon) => void;
 }
 
 const useCouponForm = ({ onCouponAdd }: Props) => {
-  const initialCoupon: Coupon = {
-    name: "",
-    code: "",
-    discountType: "percentage",
-    discountValue: 0,
-  };
-  const [newCoupon, setNewCoupon] = useState<Coupon>(initialCoupon);
+  const [newCoupon, setNewCoupon] = useState<Coupon>(createInitialCoupon());
 
   const handleAddCoupon = () => {
     onCouponAdd(newCoupon);
-    setNewCoupon(initialCoupon);
+    setNewCoupon(createInitialCoupon());
   };
 
   const handleNewCouponChange = (
@@ -24,11 +22,12 @@ const useCouponForm = ({ onCouponAdd }: Props) => {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const { type, name, value } = e.target;
-    setNewCoupon((prevNewCoupon) => ({
-      ...prevNewCoupon,
-      [name]: type === "number" ? parseInt(value) : value,
-    }));
+    setNewCoupon((prevNewCoupon) =>
+      updateCouponField(
+        prevNewCoupon,
+        e.target as { name: keyof Coupon; value: string; type?: string }
+      )
+    );
   };
 
   return { newCoupon, handleAddCoupon, handleNewCouponChange };
