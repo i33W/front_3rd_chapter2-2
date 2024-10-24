@@ -13,6 +13,7 @@ import { AdminPage } from "../../refactoring/components/AdminPage";
 import { Coupon, Product } from "../../types";
 import useNewProduct from "../../refactoring/hooks/useNewProduct";
 import useProductItem from "../../refactoring/hooks/useProductItem";
+import useCouponForm from "../../refactoring/hooks/useCouponForm";
 
 const mockProducts: Product[] = [
   {
@@ -566,6 +567,100 @@ describe("advanced > ", () => {
       });
 
       expect(result.current.editingProduct!.discounts).toEqual([]);
+    });
+  });
+
+  describe("useCouponForm 훅 테스트 > ", () => {
+    const initialCoupon: Coupon = {
+      name: "",
+      code: "",
+      discountType: "percentage",
+      discountValue: 0,
+    };
+
+    const mockOnCouponAdd = vi.fn();
+
+    test("CouponForm의 초기 상태 확인", () => {
+      const { result } = renderHook(() =>
+        useCouponForm({ onCouponAdd: mockOnCouponAdd })
+      );
+      expect(result.current.newCoupon).toEqual(initialCoupon);
+    });
+
+    test("쿠폰을 추가하고 초기 상태로 재설정", () => {
+      const { result } = renderHook(() =>
+        useCouponForm({ onCouponAdd: mockOnCouponAdd })
+      );
+
+      act(() => {
+        result.current.handleAddCoupon();
+      });
+
+      expect(mockOnCouponAdd).toHaveBeenCalledWith(initialCoupon);
+      expect(result.current.newCoupon).toEqual(initialCoupon);
+    });
+
+    test("쿠폰 상태 변경", () => {
+      const nameChangedTarget = {
+        type: "text",
+        name: "name",
+        value: "변경된 쿠폰 이름",
+      };
+      const codeChangedTarget = {
+        type: "text",
+        name: "code",
+        value: "변경된 쿠폰 코드",
+      };
+      const discountTypeChangedTarget = {
+        type: "text",
+        name: "discountType",
+        value: "amount",
+      };
+      const discountValueChangedTarget = {
+        type: "number",
+        name: "discountValue",
+        value: "10",
+      };
+
+      const { result } = renderHook(() =>
+        useCouponForm({ onCouponAdd: mockOnCouponAdd })
+      );
+
+      act(() => {
+        result.current.handleNewCouponChange({
+          target: nameChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.newCoupon.name).toBe(nameChangedTarget.value);
+
+      act(() => {
+        result.current.handleNewCouponChange({
+          target: codeChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.newCoupon.code).toBe(codeChangedTarget.value);
+
+      act(() => {
+        result.current.handleNewCouponChange({
+          target: discountTypeChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.newCoupon.discountType).toBe(
+        discountTypeChangedTarget.value
+      );
+
+      act(() => {
+        result.current.handleNewCouponChange({
+          target: discountValueChangedTarget,
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+
+      expect(result.current.newCoupon.discountValue).toBe(
+        parseInt(discountValueChangedTarget.value)
+      );
     });
   });
 });
